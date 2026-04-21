@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menú Interactivo | IED María Alfaro de Ospino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c2410c; /* Naranja Institucional */
+            --secondary: #eab308; /* Dorado */
+            --accent: #166534; /* Verde */
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        
+        /* Estilo de edición */
+        [contenteditable="true"]:focus {
+            outline: 2px dashed var(--primary);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .tab-active {
+            border-bottom: 4px solid var(--primary);
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body class="pb-20">
+
+<div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 no-print">
+    <button onclick="saveAll()" class="bg-orange-700 hover:bg-orange-800 text-white px-6 py-4 rounded-full shadow-2xl font-bold flex items-center gap-2 transition-all active:scale-95">
+        💾 GUARDAR TODO (100 PLATOS)
+    </button>
+</div>
+
+<header class="bg-white border-b border-gray-200 py-8 shadow-sm">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="font-display text-3xl md:text-4xl text-gray-900">
+            Plato Cocina <span class="text-orange-700 italic">y se Divierte</span>
+        </h1>
+        <p class="text-gray-500 mt-2 font-semibold uppercase tracking-widest text-sm">400 Años de Tradición - IED María Alfaro de Ospino</p>
+    </div>
+</header>
+
+<nav class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b no-print">
+    <div class="container mx-auto px-4 flex justify-center gap-4 md:gap-12 py-4">
+        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn pb-2 text-lg transition-all tab-active">🥘 Salados</button>
+        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn pb-2 text-lg transition-all text-gray-400">🍰 Postres</button>
+        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn pb-2 text-lg transition-all text-gray-400">🍹 Bebidas</button>
+    </div>
+</nav>
+
+<main class="container mx-auto px-4 py-8">
+    <div id="platos-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+</main>
+
+<script>
+    // Configuración: 40 Salados, 30 Postres, 30 Bebidas = 100 platos
+    const CONFIG = {
+        salados: { count: 40, color: 'border-orange-500', icon: '🥘' },
+        postres: { count: 30, color: 'border-pink-500', icon: '🍰' },
+        bebidas: { count: 30, color: 'border-blue-500', icon: '🍹' }
+    };
+
+    let currentCategory = 'salados';
+
+    function createPlatoCard(category, index) {
+        const id = `${category}-${index}`;
+        return `
+            <div class="plato-card bg-white rounded-xl shadow-md overflow-hidden border-t-4 ${CONFIG[category].color} transition-hover hover:shadow-xl p-6" data-category="${category}">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-2xl">${CONFIG[category].icon}</span>
+                    <span class="text-xs font-bold text-gray-300">#${index + 1}</span>
+                </div>
+                <h3 id="name-${id}" contenteditable="true" class="font-display text-xl mb-3 text-gray-800">Nombre del Plato</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-orange-600 mb-1">Ingredientes</label>
+                        <p id="ing-${id}" contenteditable="true" class="text-sm text-gray-600 italic">Lista de ingredientes...</p>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold text-green-700 mb-1">Preparación corta</label>
+                        <p id="prep-${id}" contenteditable="true" class="text-sm text-gray-700 leading-relaxed text-justify">Describe los pasos aquí...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderPlatos() {
+        const container = document.getElementById('platos-container');
+        container.innerHTML = '';
+        
+        const cat = CONFIG[currentCategory];
+        for (let i = 0; i < cat.count; i++) {
+            container.innerHTML += createPlatoCard(currentCategory, i);
+        }
+        loadSavedData(); // Cargar los textos guardados después de renderizar
+    }
+
+    function showCategory(cat) {
+        currentCategory = cat;
+        // Actualizar botones
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('tab-active');
+            btn.classList.add('text-gray-400');
+        });
+        document.getElementById(`btn-${cat}`).classList.add('tab-active');
+        document.getElementById(`btn-${cat}`).classList.remove('text-gray-400');
+        
+        renderPlatos();
+    }
+
+    // PERSISTENCIA
+    function saveAll() {
+        const data = {};
+        const editables = document.querySelectorAll('[contenteditable="true"]');
+        editables.forEach(el => {
+            data[el.id] = el.innerText;
+        });
+        localStorage.setItem('menu_100_platos', JSON.stringify(data));
+        alert("✅ Se han guardado los datos de los 100 platos en este navegador.");
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('menu_100_platos');
+        if (saved) {
+            const data = JSON.parse(saved);
+            Object.keys(data).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = data[id];
+            });
+        }
+    }
+
+    // Iniciar con la primera categoría
+    renderPlatos();
+</script>
+
+</body>
+</html>
