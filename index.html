@@ -11,57 +11,97 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#E9723A', secondary: '#133959', neutralBg: '#F9F5F1', pTag: '#AE8B69' },
-                    fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] }
+                    colors: {
+                        primary: '#E9723A', // Naranja vibrante
+                        secondary: '#133959', // Azul marino profundo
+                        neutralBg: '#F9F5F1', // Fondo crema claro
+                        pTag: '#AE8B69' // Color de etiqueta (café claro)
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
                 }
             }
         }
     </script>
     <style>
-        .tab-btn { transition: all 0.3s ease; border-bottom: 4px solid transparent; padding-bottom: 8px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        .tab-active { border-bottom: 4px solid #E9723A !important; color: #E9723A !important; }
-        [contenteditable="true"]:focus { outline: none; background: #fff7ed; border-radius: 8px; padding: 2px 5px; }
+        [contenteditable="true"]:focus { 
+            outline: 3px solid #E9723A; 
+            background: #fff; 
+            padding: 4px; 
+            border-radius: 8px; 
+        }
+        .tab-active { 
+            border-bottom: 4px solid #E9723A; 
+            color: #E9723A; 
+            font-weight: 800; 
+        }
+        .text-orange {
+            color: #C2410C;
+        }
     </style>
 </head>
-<body class="bg-neutralBg min-h-screen pb-40 font-sans">
+<body class="bg-neutralBg min-h-screen pb-32 font-sans">
 
 <header class="py-10 text-center px-4 max-w-6xl mx-auto border-b border-gray-200">
     <div class="inline-flex items-center gap-2 border border-gray-200 bg-white rounded-full px-4 py-1.5 shadow-sm mb-6 text-sm font-semibold tracking-wide text-pTag">
-        <span class="w-2.5 h-2.5 rounded-full bg-pTag"></span> MAGDALENA · COLOMBIA
+        <span class="w-2.5 h-2.5 rounded-full bg-pTag"></span>
+        MAGDALENA · COLOMBIA
     </div>
-    <h1 class="text-4xl md:text-5xl font-black text-secondary leading-tight max-w-4xl mx-auto mb-4">
-        Institución Educativa Técnica Departamental <span class="block text-[#C2410C]">“María Alfaro de Ospino”</span>
+    <h1 class="text-4xl md:text-5xl font-black text-secondary leading-tight max-w-4xl mx-auto mb-4 font-sans">
+        Institución Educativa Técnica Departamental
+        <span class="block text-orange font-sans tracking-tight">“María Alfaro de Ospino”</span>
     </h1>
-    <p class="text-gray-500 text-xs tracking-widest uppercase font-bold">Aprobada según resolución No. 1334 de noviembre 29 de 2023</p>
+    <div class="text-gray-600 text-sm leading-relaxed max-w-3xl mx-auto space-y-1">
+        <p>Aprobada según resolución No. 1334 de noviembre 29 de 2023 · DANE: 147555000091</p>
+        <p>NIT: 819002039_7 · Correo: <a href="mailto:iedmariaalfarodeospino@sedmagdalena.gov.co" class="text-orange-700 hover:underline">iedmariaalfarodeospino@sedmagdalena.gov.co</a> · Tel: 3135165952</p>
+    </div>
 </header>
 
-<section class="bg-primary pt-16 pb-24 px-6">
-    <div class="max-w-6xl mx-auto text-center">
-        <div class="inline-block bg-white/20 border border-white/30 text-white rounded-full px-5 py-2.5 font-bold uppercase tracking-widest text-xs mb-8">PROYECTO CULTURAL</div>
-        <h2 class="text-6xl md:text-8xl font-black text-white leading-tight font-serif mb-4 tracking-tighter">
-            Plato cocina <span class="block text-secondary text-5xl md:text-6xl">y se divierte</span>
-        </h2>
+<section class="bg-primary pt-16 pb-16 px-6 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto text-center md:text-left md:grid md:grid-cols-2 gap-12 items-center">
+        <div>
+            <div class="inline-block bg-white/20 border border-white/30 text-white rounded-full px-5 py-2.5 font-bold uppercase tracking-widest text-xs mb-8">
+                PROYECTO CULTURAL
+            </div>
+            <h2 class="text-6xl md:text-8xl font-black text-white leading-tight font-serif mb-6 tracking-tighter">
+                Plato cocina
+                <span class="block text-secondary">y se divierte</span>
+            </h2>
+            <p class="text-white text-lg opacity-80 leading-relaxed max-w-xl">
+                Nuestro proyecto cultural une la tradición culinaria del Magdalena con la alegría de la creatividad. 
+                Descubre 100 sabores únicos diseñados y compartidos por nuestra comunidad.
+            </p>
+        </div>
+        
+        <div class="relative mt-12 md:mt-0 flex justify-center md:justify-end">
+            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                 alt="Delicioso plato de comida colombiana" 
+                 class="w-[380px] h-[380px] object-cover rounded-3xl border-8 border-white shadow-2xl">
+        </div>
     </div>
 </section>
 
-<nav class="bg-white sticky top-0 z-50 shadow-md border-b-2 border-primary mt-[-40px] rounded-t-3xl max-w-6xl mx-auto">
-    <div class="flex justify-center gap-6 md:gap-12 p-6">
-        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-base md:text-lg">🥘 Salados</button>
-        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-base md:text-lg">🍰 Postres</button>
-        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-base md:text-lg">🍹 Bebidas</button>
+<nav class="bg-white sticky top-0 z-50 shadow-md border-b-2 border-primary mt-[-30px] rounded-t-3xl max-w-6xl mx-auto">
+    <div class="flex justify-center gap-10 p-5">
+        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-xl">🥘 Salados</button>
+        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-500 text-xl hover:text-primary transition">🍰 Postres</button>
+        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-500 text-xl hover:text-primary transition">🍹 Bebidas</button>
     </div>
 </nav>
 
-<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl"></main>
+<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl">
+    </main>
 
-<div class="fixed bottom-8 right-8 z-50">
-    <button onclick="saveAll()" class="bg-secondary hover:bg-black text-white font-black text-sm px-10 py-5 rounded-2xl shadow-2xl transition-all active:scale-90 flex items-center gap-3">
-        <span class="text-xl">💾</span> GUARDAR CAMBIOS EN LA NUBE
+<div class="fixed top-6 right-6 z-50">
+    <button onclick="saveAll()" class="bg-secondary hover:bg-black text-white font-bold text-sm px-8 py-3 rounded-full shadow-2xl transition-all active:scale-95 flex items-center gap-2.5 group">
+        <span>💾</span> <span class="group-hover:tracking-wider transition-all">GUARDAR CAMBIOS GLOBALMENTE</span>
     </button>
 </div>
 
 <script>
-    // CREDENCIALES SUPABASE
+    // CONFIGURACIÓN DE TU NUBE (Usa las credenciales que ya tenías)
     const SB_URL = 'https://sexadxzqssmhvbzjtupd.supabase.co';
     const SB_KEY = 'sb_publishable_iV2bAQ3LGo1NbaWG-gdSRg_Z9uWuLeE'; 
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -69,66 +109,34 @@
     let currentCat = 'salados';
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
-    // Cargar datos guardados
     async function loadData() {
+        // En este diseño, el status se integró como parte de los textos fijos para no romper el estilo
         const { data, error } = await _supabase.from('menu_platos').select('*');
+        
         if (data) {
             data.forEach(item => {
                 const el = document.getElementById(item.id_plato);
-                if (el) {
-                    if (el.tagName === 'IMG') {
-                        el.src = item.contenido || 'https://via.placeholder.com/400?text=Pega+Link+Aqui';
-                    } else {
-                        el.innerText = item.contenido;
-                    }
-                }
+                if (el) el.innerText = item.contenido;
             });
         }
     }
 
-    // Guardar todo
     async function saveAll() {
-        const elements = document.querySelectorAll('[data-db]');
+        const elements = document.querySelectorAll('[contenteditable="true"]');
         const updates = Array.from(elements).map(el => ({
             id_plato: el.id,
-            contenido: el.tagName === 'IMG' ? el.src : el.innerText
+            contenido: el.innerText
         }));
 
         const { error } = await _supabase.from('menu_platos').upsert(updates);
+        
         if (!error) {
-            alert("¡Éxito! El menú de 'Plato cocina y se divierte' ha sido actualizado para todos.");
+            alert("¡Cambios guardados exitosamente! Todo el mundo verá tus actualizaciones.");
         } else {
-            alert("Error al conectar con la base de datos.");
+            alert("Hubo un error al guardar. Verifica la conexión.");
         }
     }
 
-    // Cambiar imagen al pegar link
-    function updateImage(id, url) {
-        if(url.trim() !== "") {
-            document.getElementById(id).src = url;
-        }
-    }
-
-    // LÓGICA DE LA BARRA DE NAVEGACIÓN
-    function showCategory(cat) {
-        currentCat = cat;
-
-        // Resetear todos los botones
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('tab-active');
-        });
-
-        // Activar el botón clicado
-        const selectedBtn = document.getElementById(`btn-${cat}`);
-        if (selectedBtn) {
-            selectedBtn.classList.add('tab-active');
-        }
-
-        // Renderizar nuevos platos
-        render();
-    }
-
-    // Dibujar las tarjetas
     function render() {
         const cont = document.getElementById('container');
         cont.innerHTML = '';
@@ -137,31 +145,25 @@
         for (let i = 1; i <= limit; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
-                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
-                    <div class="relative h-56 bg-gray-200 group">
-                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Sin+Imagen" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                            <input type="text" placeholder="Pega link de imagen aquí..." 
-                                   onchange="updateImage('img-${id}', this.value)"
-                                   class="w-full p-2 rounded-lg text-xs font-bold border-none shadow-lg">
-                        </div>
-                    </div>
-                    <div class="p-8">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">${currentCat}</span>
-                            <span class="text-[10px] font-bold text-gray-300 italic">#${i}</span>
-                        </div>
-                        <h3 id="title-${id}" data-db contenteditable="true" class="text-2xl font-black text-secondary leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
-                        <p id="desc-${id}" data-db contenteditable="true" class="text-gray-500 mt-4 text-sm italic border-t pt-4 border-gray-50 leading-relaxed">
-                            Escribe aquí los ingredientes o una descripción divertida...
-                        </p>
-                    </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300 relative">
+                    <div class="absolute top-6 right-6 text-xs font-black text-primary/30 uppercase font-serif tracking-widest">N#${i}</div>
+                    <span class="text-xs font-bold text-primary uppercase font-sans tracking-wide">Plato ${currentCat}</span>
+                    <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-secondary mt-2 leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
+                    <p id="desc-${id}" contenteditable="true" class="text-gray-600 mt-4 text-sm leading-relaxed italic border-t pt-4 border-gray-100">
+                        Haz clic aquí para editar la descripción e ingredientes...
+                    </p>
                 </div>`;
         }
         loadData();
     }
 
-    // Iniciar
+    function showCategory(cat) {
+        currentCat = cat;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-gray-500'));
+        document.getElementById(`btn-${cat}`).classList.add('tab-active');
+        render();
+    }
+
     render();
 </script>
 </body>
