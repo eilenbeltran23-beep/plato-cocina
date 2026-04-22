@@ -58,11 +58,11 @@
         <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
             <div>
                 <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada del Proyecto</p>
-                <p id="encargada-nombre" contenteditable="true" class="text-lg font-bold text-secondary italic">Haz clic para nombre</p>
+                <p id="encargada-nombre" data-db contenteditable="true" class="text-lg font-bold text-secondary italic">Haz clic para nombre</p>
             </div>
             <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-12">
                 <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Grado Escolar</p>
-                <p id="grado-escolar" contenteditable="true" class="text-lg font-bold text-secondary">Escribe el grado</p>
+                <p id="grado-escolar" data-db contenteditable="true" class="text-lg font-bold text-secondary">Escribe el grado</p>
             </div>
         </div>
     </div>
@@ -78,13 +78,9 @@
                 Plato cocina
                 <span class="block text-secondary">y se divierte</span>
             </h2>
-            <p class="text-white text-lg opacity-80 leading-relaxed max-w-xl">
-                Nuestro proyecto cultural une la tradición culinaria del Magdalena con la alegría de la creatividad. 
-                Descubre 100 sabores únicos diseñados y compartidos por nuestra comunidad.
-            </p>
         </div>
         <div class="relative mt-12 md:mt-0 flex justify-center md:justify-end">
-            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" class="w-[380px] h-[380px] object-cover rounded-3xl border-8 border-white shadow-2xl">
+            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" class="w-[300px] h-[300px] object-cover rounded-3xl border-8 border-white shadow-2xl">
         </div>
     </div>
 </section>
@@ -114,29 +110,38 @@
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
     async function loadData() {
-        const { data, error } = await _supabase.from('menu_platos').select('*');
+        const { data } = await _supabase.from('menu_platos').select('*');
         if (data) {
             data.forEach(item => {
                 const el = document.getElementById(item.id_plato);
-                if (el) el.innerText = item.contenido;
+                if (el) {
+                    if (el.tagName === 'IMG') {
+                        el.src = item.contenido || 'https://via.placeholder.com/400?text=Sube+Foto';
+                    } else {
+                        el.innerText = item.contenido;
+                    }
+                }
             });
         }
     }
 
     async function saveAll() {
-        // Seleccionamos todos los campos editables (incluyendo encargada, grado y estudiantes)
-        const elements = document.querySelectorAll('[contenteditable="true"]');
+        const elements = document.querySelectorAll('[data-db]');
         const updates = Array.from(elements).map(el => ({
             id_plato: el.id,
-            contenido: el.innerText
+            contenido: el.tagName === 'IMG' ? el.src : el.innerText
         }));
 
         const { error } = await _supabase.from('menu_platos').upsert(updates);
         if (!error) {
-            alert("¡Todo guardado! Encargada, grado y recetas actualizadas.");
+            alert("¡Todo guardado correctamente!");
         } else {
             alert("Error al guardar.");
         }
+    }
+
+    function updateImage(id, url) {
+        if(url) document.getElementById(id).src = url;
     }
 
     function render() {
@@ -147,19 +152,27 @@
         for (let i = 1; i <= limit; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300 relative flex flex-col justify-between">
-                    <div>
-                        <div class="absolute top-6 right-6 text-[10px] font-black text-primary/30 uppercase tracking-widest">N#${i}</div>
-                        <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Plato ${currentCat}</span>
-                        <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-secondary mt-2 leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
-                        <p id="desc-${id}" contenteditable="true" class="text-gray-600 mt-4 text-sm leading-relaxed italic border-t pt-4 border-gray-50">
-                            Haz clic aquí para editar descripción e ingredientes...
-                        </p>
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col">
+                    <div class="relative h-48 bg-gray-200 group">
+                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Pega+Link+Aqui" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                            <input type="text" placeholder="Pega URL de imagen..." 
+                                   onchange="updateImage('img-${id}', this.value)"
+                                   class="w-full p-2 rounded text-xs">
+                        </div>
                     </div>
                     
-                    <div class="mt-6 pt-4 border-t border-dashed border-gray-200">
-                        <p class="text-[9px] font-bold text-pTag uppercase tracking-[0.2em] mb-1">Autor de la receta:</p>
-                        <p id="autor-${id}" contenteditable="true" class="text-sm font-bold text-secondary uppercase">Nombre del Estudiante</p>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest italic">N#${i} - ${currentCat}</span>
+                            <h3 id="title-${id}" data-db contenteditable="true" class="text-xl font-black text-secondary mt-1 font-serif tracking-tighter">Nombre del Plato</h3>
+                            <p id="desc-${id}" data-db contenteditable="true" class="text-gray-500 mt-2 text-sm italic border-t pt-4 border-gray-50">Haz clic para editar descripción...</p>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-dashed border-gray-200">
+                            <p class="text-[9px] font-bold text-pTag uppercase tracking-widest mb-1">Estudiante:</p>
+                            <p id="autor-${id}" data-db contenteditable="true" class="text-sm font-bold text-secondary uppercase">Escribe tu nombre</p>
+                        </div>
                     </div>
                 </div>`;
         }
