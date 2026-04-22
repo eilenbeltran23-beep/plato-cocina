@@ -12,10 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#E9723A', // Naranja vibrante
-                        secondary: '#133959', // Azul marino profundo
-                        neutralBg: '#F9F5F1', // Fondo crema claro
-                        pTag: '#AE8B69' // Color de etiqueta (café claro)
+                        primary: '#E9723A',
+                        secondary: '#133959',
+                        neutralBg: '#F9F5F1',
+                        pTag: '#AE8B69'
                     },
                     fontFamily: {
                         serif: ['Playfair Display', 'serif'],
@@ -53,9 +53,18 @@
         Institución Educativa Técnica Departamental
         <span class="block text-orange font-sans tracking-tight">“María Alfaro de Ospino”</span>
     </h1>
-    <div class="text-gray-600 text-sm leading-relaxed max-w-3xl mx-auto space-y-1">
-        <p>Aprobada según resolución No. 1334 de noviembre 29 de 2023 · DANE: 147555000091</p>
-        <p>NIT: 819002039_7 · Correo: <a href="mailto:iedmariaalfarodeospino@sedmagdalena.gov.co" class="text-orange-700 hover:underline">iedmariaalfarodeospino@sedmagdalena.gov.co</a> · Tel: 3135165952</p>
+    
+    <div class="bg-white/50 border border-gray-100 rounded-2xl p-6 max-w-2xl mx-auto mt-6 shadow-sm">
+        <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
+            <div>
+                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada del Proyecto</p>
+                <p id="encargada-nombre" contenteditable="true" class="text-lg font-bold text-secondary italic">Haz clic para nombre</p>
+            </div>
+            <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-12">
+                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Grado Escolar</p>
+                <p id="grado-escolar" contenteditable="true" class="text-lg font-bold text-secondary">Escribe el grado</p>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -74,11 +83,8 @@
                 Descubre 100 sabores únicos diseñados y compartidos por nuestra comunidad.
             </p>
         </div>
-        
         <div class="relative mt-12 md:mt-0 flex justify-center md:justify-end">
-            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" 
-                 alt="Delicioso plato de comida colombiana" 
-                 class="w-[380px] h-[380px] object-cover rounded-3xl border-8 border-white shadow-2xl">
+            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" class="w-[380px] h-[380px] object-cover rounded-3xl border-8 border-white shadow-2xl">
         </div>
     </div>
 </section>
@@ -91,17 +97,15 @@
     </div>
 </nav>
 
-<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl">
-    </main>
+<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl"></main>
 
 <div class="fixed top-6 right-6 z-50">
     <button onclick="saveAll()" class="bg-secondary hover:bg-black text-white font-bold text-sm px-8 py-3 rounded-full shadow-2xl transition-all active:scale-95 flex items-center gap-2.5 group">
-        <span>💾</span> <span class="group-hover:tracking-wider transition-all">GUARDAR CAMBIOS GLOBALMENTE</span>
+        <span>💾</span> <span class="group-hover:tracking-wider transition-all">GUARDAR TODO EN LA NUBE</span>
     </button>
 </div>
 
 <script>
-    // CONFIGURACIÓN DE TU NUBE (Usa las credenciales que ya tenías)
     const SB_URL = 'https://sexadxzqssmhvbzjtupd.supabase.co';
     const SB_KEY = 'sb_publishable_iV2bAQ3LGo1NbaWG-gdSRg_Z9uWuLeE'; 
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -110,9 +114,7 @@
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
     async function loadData() {
-        // En este diseño, el status se integró como parte de los textos fijos para no romper el estilo
         const { data, error } = await _supabase.from('menu_platos').select('*');
-        
         if (data) {
             data.forEach(item => {
                 const el = document.getElementById(item.id_plato);
@@ -122,6 +124,7 @@
     }
 
     async function saveAll() {
+        // Seleccionamos todos los campos editables (incluyendo encargada, grado y estudiantes)
         const elements = document.querySelectorAll('[contenteditable="true"]');
         const updates = Array.from(elements).map(el => ({
             id_plato: el.id,
@@ -129,11 +132,10 @@
         }));
 
         const { error } = await _supabase.from('menu_platos').upsert(updates);
-        
         if (!error) {
-            alert("¡Cambios guardados exitosamente! Todo el mundo verá tus actualizaciones.");
+            alert("¡Todo guardado! Encargada, grado y recetas actualizadas.");
         } else {
-            alert("Hubo un error al guardar. Verifica la conexión.");
+            alert("Error al guardar.");
         }
     }
 
@@ -145,13 +147,20 @@
         for (let i = 1; i <= limit; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300 relative">
-                    <div class="absolute top-6 right-6 text-xs font-black text-primary/30 uppercase font-serif tracking-widest">N#${i}</div>
-                    <span class="text-xs font-bold text-primary uppercase font-sans tracking-wide">Plato ${currentCat}</span>
-                    <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-secondary mt-2 leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
-                    <p id="desc-${id}" contenteditable="true" class="text-gray-600 mt-4 text-sm leading-relaxed italic border-t pt-4 border-gray-100">
-                        Haz clic aquí para editar la descripción e ingredientes...
-                    </p>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300 relative flex flex-col justify-between">
+                    <div>
+                        <div class="absolute top-6 right-6 text-[10px] font-black text-primary/30 uppercase tracking-widest">N#${i}</div>
+                        <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Plato ${currentCat}</span>
+                        <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-secondary mt-2 leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
+                        <p id="desc-${id}" contenteditable="true" class="text-gray-600 mt-4 text-sm leading-relaxed italic border-t pt-4 border-gray-50">
+                            Haz clic aquí para editar descripción e ingredientes...
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-dashed border-gray-200">
+                        <p class="text-[9px] font-bold text-pTag uppercase tracking-[0.2em] mb-1">Autor de la receta:</p>
+                        <p id="autor-${id}" contenteditable="true" class="text-sm font-bold text-secondary uppercase">Nombre del Estudiante</p>
+                    </div>
                 </div>`;
         }
         loadData();
