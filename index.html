@@ -3,62 +3,105 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Menú Global Netine | IED María Alfaro</title>
+    <title>Plato Cocina y se Divierte | IED María Alfaro de Ospino</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E9723A', // Naranja vibrante
+                        secondary: '#133959', // Azul marino profundo
+                        neutralBg: '#F9F5F1', // Fondo crema claro
+                        pTag: '#AE8B69' // Color de etiqueta (café claro)
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
         [contenteditable="true"]:focus { 
-            outline: 3px solid #c2410c; 
+            outline: 3px solid #E9723A; 
             background: #fff; 
             padding: 4px; 
             border-radius: 8px; 
         }
         .tab-active { 
-            border-bottom: 4px solid #c2410c; 
-            color: #c2410c; 
-            font-weight: 900; 
+            border-bottom: 4px solid #E9723A; 
+            color: #E9723A; 
+            font-weight: 800; 
         }
-        .card-menu {
-            transition: all 0.3s ease;
-        }
-        .card-menu:hover {
-            transform: translateY(-5px);
-            border-color: #fb923c;
+        .text-orange {
+            color: #C2410C;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-32">
+<body class="bg-neutralBg min-h-screen pb-32 font-sans">
 
-<header class="bg-white shadow-md py-8 text-center border-b-8 border-orange-700">
-    <h1 class="text-4xl font-black text-slate-900 tracking-tight">
-        PLATOS <span class="text-orange-700 italic">NETINE</span>
+<header class="py-10 text-center px-4 max-w-6xl mx-auto border-b border-gray-200">
+    <div class="inline-flex items-center gap-2 border border-gray-200 bg-white rounded-full px-4 py-1.5 shadow-sm mb-6 text-sm font-semibold tracking-wide text-pTag">
+        <span class="w-2.5 h-2.5 rounded-full bg-pTag"></span>
+        MAGDALENA · COLOMBIA
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black text-secondary leading-tight max-w-4xl mx-auto mb-4 font-sans">
+        Institución Educativa Técnica Departamental
+        <span class="block text-orange font-sans tracking-tight">“María Alfaro de Ospino”</span>
     </h1>
-    <p id="status" class="text-sm font-bold text-slate-400 mt-2 uppercase tracking-widest">
-        🔄 Sincronizando nube...
-    </p>
+    <div class="text-gray-600 text-sm leading-relaxed max-w-3xl mx-auto space-y-1">
+        <p>Aprobada según resolución No. 1334 de noviembre 29 de 2023 · DANE: 147555000091</p>
+        <p>NIT: 819002039_7 · Correo: <a href="mailto:iedmariaalfarodeospino@sedmagdalena.gov.co" class="text-orange-700 hover:underline">iedmariaalfarodeospino@sedmagdalena.gov.co</a> · Tel: 3135165952</p>
+    </div>
 </header>
 
-<nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b">
-    <div class="flex justify-center gap-10 p-4">
-        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-lg uppercase">🥘 Salados</button>
-        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-slate-400 text-lg uppercase">🍰 Postres</button>
-        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-slate-400 text-lg uppercase">🍹 Bebidas</button>
+<section class="bg-primary pt-16 pb-16 px-6 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto text-center md:text-left md:grid md:grid-cols-2 gap-12 items-center">
+        <div>
+            <div class="inline-block bg-white/20 border border-white/30 text-white rounded-full px-5 py-2.5 font-bold uppercase tracking-widest text-xs mb-8">
+                PROYECTO CULTURAL
+            </div>
+            <h2 class="text-6xl md:text-8xl font-black text-white leading-tight font-serif mb-6 tracking-tighter">
+                Plato cocina
+                <span class="block text-secondary">y se divierte</span>
+            </h2>
+            <p class="text-white text-lg opacity-80 leading-relaxed max-w-xl">
+                Nuestro proyecto cultural une la tradición culinaria del Magdalena con la alegría de la creatividad. 
+                Descubre 100 sabores únicos diseñados y compartidos por nuestra comunidad.
+            </p>
+        </div>
+        
+        <div class="relative mt-12 md:mt-0 flex justify-center md:justify-end">
+            <img src="https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=800" 
+                 alt="Delicioso plato de comida colombiana" 
+                 class="w-[380px] h-[380px] object-cover rounded-3xl border-8 border-white shadow-2xl">
+        </div>
+    </div>
+</section>
+
+<nav class="bg-white sticky top-0 z-50 shadow-md border-b-2 border-primary mt-[-30px] rounded-t-3xl max-w-6xl mx-auto">
+    <div class="flex justify-center gap-10 p-5">
+        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-xl">🥘 Salados</button>
+        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-500 text-xl hover:text-primary transition">🍰 Postres</button>
+        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-500 text-xl hover:text-primary transition">🍹 Bebidas</button>
     </div>
 </nav>
 
-<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+<main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl">
     </main>
 
-<div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t p-6 flex justify-center shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-    <button onclick="saveAll()" class="bg-orange-700 hover:bg-orange-800 text-white font-black text-xl px-12 py-5 rounded-2xl shadow-2xl transition-all active:scale-90 flex items-center gap-3">
-        <span>🌍</span> GUARDAR CAMBIOS PARA TODOS
+<div class="fixed top-6 right-6 z-50">
+    <button onclick="saveAll()" class="bg-secondary hover:bg-black text-white font-bold text-sm px-8 py-3 rounded-full shadow-2xl transition-all active:scale-95 flex items-center gap-2.5 group">
+        <span>💾</span> <span class="group-hover:tracking-wider transition-all">GUARDAR CAMBIOS GLOBALMENTE</span>
     </button>
 </div>
 
 <script>
-    // --- CONFIGURACIÓN DE TU NUBE ---
+    // CONFIGURACIÓN DE TU NUBE (Usa las credenciales que ya tenías)
     const SB_URL = 'https://sexadxzqssmhvbzjtupd.supabase.co';
     const SB_KEY = 'sb_publishable_iV2bAQ3LGo1NbaWG-gdSRg_Z9uWuLeE'; 
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -66,9 +109,8 @@
     let currentCat = 'salados';
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
-    // Función para descargar datos de la nube
     async function loadData() {
-        const status = document.getElementById('status');
+        // En este diseño, el status se integró como parte de los textos fijos para no romper el estilo
         const { data, error } = await _supabase.from('menu_platos').select('*');
         
         if (data) {
@@ -76,16 +118,10 @@
                 const el = document.getElementById(item.id_plato);
                 if (el) el.innerText = item.contenido;
             });
-            status.innerText = "✅ Menú Global Conectado";
-            status.className = "text-sm font-bold text-green-600 mt-2 uppercase tracking-widest";
         }
     }
 
-    // Función para subir cambios a la nube
     async function saveAll() {
-        const status = document.getElementById('status');
-        status.innerText = "⏳ Subiendo datos a la nube...";
-        
         const elements = document.querySelectorAll('[contenteditable="true"]');
         const updates = Array.from(elements).map(el => ({
             id_plato: el.id,
@@ -95,15 +131,12 @@
         const { error } = await _supabase.from('menu_platos').upsert(updates);
         
         if (!error) {
-            alert("¡Cambios guardados! Ahora todos los que visiten la página verán tu información.");
-            status.innerText = "✅ Cambios publicados con éxito";
+            alert("¡Cambios guardados exitosamente! Todo el mundo verá tus actualizaciones.");
         } else {
-            console.error(error);
-            alert("Hubo un error al guardar. Revisa que hayas creado la tabla en Supabase.");
+            alert("Hubo un error al guardar. Verifica la conexión.");
         }
     }
 
-    // Función para dibujar los platos en pantalla
     function render() {
         const cont = document.getElementById('container');
         cont.innerHTML = '';
@@ -112,27 +145,25 @@
         for (let i = 1; i <= limit; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
-                <div class="card-menu bg-white p-8 rounded-3xl shadow-sm border-2 border-slate-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-orange-700"></div>
-                    <span class="text-xs font-black text-orange-600 uppercase tracking-tighter italic">N#${i} - ${currentCat}</span>
-                    <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-slate-800 mt-2 leading-tight">Nombre del Plato</h3>
-                    <p id="desc-${id}" contenteditable="true" class="text-slate-500 mt-4 text-sm leading-relaxed border-t pt-4 border-slate-50 italic">
-                        Haz clic aquí para escribir los ingredientes y el precio...
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300 relative">
+                    <div class="absolute top-6 right-6 text-xs font-black text-primary/30 uppercase font-serif tracking-widest">N#${i}</div>
+                    <span class="text-xs font-bold text-primary uppercase font-sans tracking-wide">Plato ${currentCat}</span>
+                    <h3 id="title-${id}" contenteditable="true" class="text-2xl font-black text-secondary mt-2 leading-tight font-serif tracking-tighter">Nombre del Plato</h3>
+                    <p id="desc-${id}" contenteditable="true" class="text-gray-600 mt-4 text-sm leading-relaxed italic border-t pt-4 border-gray-100">
+                        Haz clic aquí para editar la descripción e ingredientes...
                     </p>
                 </div>`;
         }
-        loadData(); // Después de dibujar, traer los textos guardados
+        loadData();
     }
 
-    // Función para cambiar entre pestañas
     function showCategory(cat) {
         currentCat = cat;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-slate-400'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-gray-500'));
         document.getElementById(`btn-${cat}`).classList.add('tab-active');
         render();
     }
 
-    // Iniciar la página
     render();
 </script>
 </body>
