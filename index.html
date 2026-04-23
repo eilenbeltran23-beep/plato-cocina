@@ -19,22 +19,25 @@
     </script>
     <style>
         [contenteditable="true"]:focus { outline: 3px solid #E9723A; background: #fff; padding: 2px; border-radius: 4px; }
-        /* La clase tab-active ahora incluye el borde inferior naranja */
         .tab-active { 
             border-bottom: 4px solid #E9723A; 
             color: #E9723A !important; 
             font-weight: 800;
             padding-bottom: 8px;
         }
-        .camera-overlay { background: rgba(0,0,0,0.9); display: none; }
+        /* CRÍTICO: Aseguramos que el modal inicie totalmente oculto */
+        #camera-modal { 
+            display: none; 
+            background: rgba(0,0,0,0.9); 
+        }
         .url-input { background: rgba(255,255,255,0.9); border: 1px solid #ddd; font-size: 10px; padding: 4px 8px; border-radius: 6px; width: 100%; }
     </style>
 </head>
 <body class="bg-neutralBg min-h-screen pb-32 font-sans">
 
-<div id="camera-modal" class="fixed inset-0 z-[100] camera-overlay flex flex-col items-center justify-center p-4">
+<div id="camera-modal" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4">
     <div class="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl">
-        <video id="video" class="w-full rounded-2xl bg-black mb-4" autoplay></video>
+        <video id="video" class="w-full rounded-2xl bg-black mb-4" autoplay playsinline></video>
         <div class="flex gap-3">
             <button onclick="takePhoto()" class="flex-1 bg-primary text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition">📸 CAPTURAR</button>
             <button onclick="closeCamera()" class="flex-1 bg-gray-200 text-secondary font-bold py-4 rounded-2xl active:scale-95 transition">CERRAR</button>
@@ -51,7 +54,7 @@
         IED <span class="text-[#C2410C]">“María Alfaro de Ospino”</span>
     </h1>
     
-    <div class="bg-white/50 border border-gray-100 rounded-2xl p-6 max-w-2xl mx-auto mt-6 shadow-sm text-center">
+    <div class="bg-white/50 border border-gray-100 rounded-2xl p-6 max-w-2xl mx-auto mt-6 shadow-sm">
         <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
             <div>
                 <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada</p>
@@ -71,25 +74,24 @@
         <img id="img-hero-principal" data-db src="https://github.com/eilenbeltran23-beep/plato-cocina/blob/main/hero-plato.jpg?raw=true" class="w-full h-full object-cover rounded-full border-8 border-white shadow-2xl">
         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-full p-6 gap-2">
             <input type="text" placeholder="Pegar URL + Enter" onchange="updateMedia('img-hero-principal', this.value)" class="url-input text-black">
-            <p class="text-[8px] font-bold uppercase tracking-widest">ó</p>
             <button onclick="document.getElementById('file-hero').click()" class="bg-white text-black text-[9px] px-4 py-1.5 rounded-full font-bold shadow-md">📂 SUBIR FOTO</button>
             <input type="file" id="file-hero" class="hidden" accept="image/*" onchange="importFile(this, 'img-hero-principal')">
         </div>
     </div>
 </section>
 
-<nav class="bg-white sticky top-0 z-50 shadow-md mt-[-30px] rounded-t-3xl max-w-6xl mx-auto overflow-hidden">
-    <div class="flex justify-center gap-10 p-5 border-b-2 border-gray-100">
-        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-xl flex items-center gap-2 transition-all">🥘 Salados</button>
-        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-400 text-xl flex items-center gap-2 transition-all hover:text-primary">🍰 Postres</button>
-        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-400 text-xl flex items-center gap-2 transition-all hover:text-primary">🍹 Bebidas</button>
+<nav class="bg-white sticky top-0 z-50 shadow-md mt-[-30px] rounded-t-3xl max-w-6xl mx-auto">
+    <div class="flex justify-center gap-10 p-5">
+        <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-xl">🥘 Salados</button>
+        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-400 text-xl hover:text-primary transition">🍰 Postres</button>
+        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-400 text-xl hover:text-primary transition">🍹 Bebidas</button>
     </div>
 </nav>
 
 <main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl"></main>
 
 <div class="fixed bottom-6 right-6 z-50">
-    <button onclick="saveAll()" class="bg-secondary text-white font-bold px-10 py-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all">💾 GUARDAR TODO</button>
+    <button onclick="saveAll()" class="bg-secondary text-white font-bold px-10 py-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-sm">💾 Guardar Todo</button>
 </div>
 
 <script>
@@ -102,48 +104,42 @@
     let audioChunks = [];
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
-    // --- LÓGICA DE CATEGORÍAS Y BARRA NARANJA ---
-    function showCategory(cat) {
-        currentCat = cat;
-        
-        // 1. Buscamos todos los botones
-        const buttons = document.querySelectorAll('.tab-btn');
-        
-        // 2. Quitamos la clase 'tab-active' de todos y restauramos el color gris
-        buttons.forEach(btn => {
-            btn.classList.remove('tab-active');
-            btn.classList.add('text-gray-400');
-        });
-        
-        // 3. Se la ponemos solo al botón clickeado y quitamos el gris
-        const activeBtn = document.getElementById(`btn-${cat}`);
-        activeBtn.classList.add('tab-active');
-        activeBtn.classList.remove('text-gray-400');
-        
-        // 4. Volvemos a dibujar los platos
-        render();
-    }
-
-    // --- CÁMARA, ARCHIVOS Y AUDIO (Sin cambios) ---
+    // --- CÁMARA: Solo se activa al llamar a la función ---
     async function openCamera(id) {
         window.targetId = id;
-        document.getElementById('camera-modal').style.display = 'flex';
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('video').srcObject = stream;
+        const modal = document.getElementById('camera-modal');
+        modal.style.display = 'flex'; // Aquí es donde se muestra
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const video = document.getElementById('video');
+            video.srcObject = stream;
+        } catch (err) {
+            alert("No se pudo acceder a la cámara. Verifica los permisos.");
+            closeCamera();
+        }
     }
+
     function closeCamera() {
-        const stream = document.getElementById('video').srcObject;
-        if(stream) stream.getTracks().forEach(t => t.stop());
-        document.getElementById('camera-modal').style.display = 'none';
+        const modal = document.getElementById('camera-modal');
+        const video = document.getElementById('video');
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+        modal.style.display = 'none'; // Aquí se oculta
     }
+
     function takePhoto() {
         const canvas = document.getElementById('canvas');
         const video = document.getElementById('video');
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth; 
+        canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
         document.getElementById(window.targetId).src = canvas.toDataURL('image/jpeg');
         closeCamera();
     }
+
+    // --- RESTO DE FUNCIONES ---
     function importFile(input, targetId) {
         const file = input.files[0];
         if (!file) return;
@@ -151,13 +147,15 @@
         reader.onload = (e) => updateMedia(targetId, e.target.result);
         reader.readAsDataURL(file);
     }
+
     function updateMedia(id, content) {
         const el = document.getElementById(id);
-        if(content.trim() !== "") {
+        if(content && content.trim() !== "") {
             el.src = content;
             if (el.tagName === 'AUDIO') el.classList.remove('hidden');
         }
     }
+
     async function startRecording(btn, audioId) {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -177,15 +175,15 @@
             btn.onclick = () => stopRecording(btn, audioId);
         } catch (err) { alert("Micrófono no disponible."); }
     }
+
     function stopRecording(btn, audioId) {
-        mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        if(mediaRecorder) mediaRecorder.stop();
+        if(mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(t => t.stop());
         btn.onclick = () => startRecording(btn, audioId);
         btn.innerText = "🎤 RE-GRABAR";
         btn.classList.replace('bg-red-500', 'bg-green-500');
     }
 
-    // --- SUPABASE ---
     async function saveAll() {
         const elements = document.querySelectorAll('[data-db]');
         const updates = Array.from(elements).map(el => ({
@@ -193,7 +191,7 @@
             contenido: (el.tagName === 'IMG' || el.tagName === 'AUDIO') ? el.src : el.innerText
         }));
         const { error } = await _supabase.from('menu_platos').upsert(updates);
-        if(!error) alert("¡Cambios guardados!");
+        if(!error) alert("¡Proyecto guardado!");
     }
 
     async function loadData() {
@@ -220,7 +218,7 @@
                     <div class="relative h-48 bg-gray-200 group">
                         <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Sube+Foto" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 gap-2">
-                            <input type="text" placeholder="Pegar URL imagen..." onchange="updateMedia('img-${id}', this.value)" class="url-input">
+                            <input type="text" placeholder="URL imagen..." onchange="updateMedia('img-${id}', this.value)" class="url-input">
                             <div class="flex gap-2">
                                 <button onclick="openCamera('img-${id}')" class="bg-white p-2 rounded-full text-sm">📸</button>
                                 <button onclick="document.getElementById('file-${id}').click()" class="bg-white p-2 rounded-full text-sm">📂</button>
@@ -249,6 +247,19 @@
         loadData();
     }
 
+    function showCategory(cat) {
+        currentCat = cat;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('tab-active');
+            b.classList.add('text-gray-400');
+        });
+        const activeBtn = document.getElementById(`btn-${cat}`);
+        activeBtn.classList.add('tab-active');
+        activeBtn.classList.remove('text-gray-400');
+        render();
+    }
+
+    // Inicialización
     render();
 </script>
 </body>
