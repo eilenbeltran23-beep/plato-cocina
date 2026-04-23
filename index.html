@@ -19,17 +19,8 @@
     </script>
     <style>
         [contenteditable="true"]:focus { outline: 3px solid #E9723A; background: #fff; padding: 2px; border-radius: 4px; }
-        .tab-active { 
-            border-bottom: 4px solid #E9723A; 
-            color: #E9723A !important; 
-            font-weight: 800;
-            padding-bottom: 8px;
-        }
-        /* CRÍTICO: Aseguramos que el modal inicie totalmente oculto */
-        #camera-modal { 
-            display: none; 
-            background: rgba(0,0,0,0.9); 
-        }
+        .tab-active { border-bottom: 4px solid #E9723A; color: #E9723A !important; font-weight: 800; padding-bottom: 8px; }
+        #camera-modal { display: none; background: rgba(0,0,0,0.9); }
         .url-input { background: rgba(255,255,255,0.9); border: 1px solid #ddd; font-size: 10px; padding: 4px 8px; border-radius: 6px; width: 100%; }
     </style>
 </head>
@@ -55,7 +46,7 @@
     </h1>
     
     <div class="bg-white/50 border border-gray-100 rounded-2xl p-6 max-w-2xl mx-auto mt-6 shadow-sm">
-        <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
+        <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12 text-center">
             <div>
                 <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada</p>
                 <p id="encargada-nombre" data-db contenteditable="true" class="text-lg font-bold text-secondary italic">Nombre</p>
@@ -104,58 +95,45 @@
     let audioChunks = [];
     const config = { salados: 40, postres: 30, bebidas: 30 };
 
-    // --- CÁMARA: Solo se activa al llamar a la función ---
+    // --- CÁMARA Y ARCHIVOS ---
     async function openCamera(id) {
         window.targetId = id;
-        const modal = document.getElementById('camera-modal');
-        modal.style.display = 'flex'; // Aquí es donde se muestra
-        
+        document.getElementById('camera-modal').style.display = 'flex';
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            const video = document.getElementById('video');
-            video.srcObject = stream;
-        } catch (err) {
-            alert("No se pudo acceder a la cámara. Verifica los permisos.");
-            closeCamera();
-        }
+            document.getElementById('video').srcObject = stream;
+        } catch (err) { closeCamera(); }
     }
-
     function closeCamera() {
-        const modal = document.getElementById('camera-modal');
         const video = document.getElementById('video');
-        if (video.srcObject) {
-            video.srcObject.getTracks().forEach(track => track.stop());
-        }
-        modal.style.display = 'none'; // Aquí se oculta
+        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+        document.getElementById('camera-modal').style.display = 'none';
     }
-
     function takePhoto() {
         const canvas = document.getElementById('canvas');
         const video = document.getElementById('video');
-        canvas.width = video.videoWidth; 
-        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        document.getElementById(window.targetId).src = canvas.toDataURL('image/jpeg');
+        updateMedia(window.targetId, canvas.toDataURL('image/jpeg'));
         closeCamera();
     }
-
-    // --- RESTO DE FUNCIONES ---
     function importFile(input, targetId) {
         const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => updateMedia(targetId, e.target.result);
-        reader.readAsDataURL(file);
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => updateMedia(targetId, e.target.result);
+            reader.readAsDataURL(file);
+        }
     }
-
     function updateMedia(id, content) {
         const el = document.getElementById(id);
-        if(content && content.trim() !== "") {
+        if(el && content) {
             el.src = content;
             if (el.tagName === 'AUDIO') el.classList.remove('hidden');
         }
     }
 
+    // --- AUDIO ---
     async function startRecording(btn, audioId) {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -175,48 +153,35 @@
             btn.onclick = () => stopRecording(btn, audioId);
         } catch (err) { alert("Micrófono no disponible."); }
     }
-
     function stopRecording(btn, audioId) {
         if(mediaRecorder) mediaRecorder.stop();
-        if(mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(t => t.stop());
         btn.onclick = () => startRecording(btn, audioId);
         btn.innerText = "🎤 RE-GRABAR";
         btn.classList.replace('bg-red-500', 'bg-green-500');
     }
 
+    // --- DATOS Y RENDERIZADO ---
     async function saveAll() {
         const elements = document.querySelectorAll('[data-db]');
         const updates = Array.from(elements).map(el => ({
             id_plato: el.id,
             contenido: (el.tagName === 'IMG' || el.tagName === 'AUDIO') ? el.src : el.innerText
         }));
-        const { error } = await _supabase.from('menu_platos').upsert(updates);
-        if(!error) alert("¡Proyecto guardado!");
+        await _supabase.from('menu_platos').upsert(updates);
+        alert("¡Datos sincronizados con éxito!");
     }
 
-    async function loadData() {
-        const { data } = await _supabase.from('menu_platos').select('*');
-        if (data) {
-            data.forEach(item => {
-                const el = document.getElementById(item.id_plato);
-                if (el && item.contenido) {
-                    el.src = item.contenido;
-                    if (el.tagName === 'AUDIO') el.classList.remove('hidden');
-                    if (el.tagName !== 'IMG' && el.tagName !== 'AUDIO') el.innerText = item.contenido;
-                }
-            });
-        }
-    }
-
-    function render() {
+    async function render() {
         const cont = document.getElementById('container');
         cont.innerHTML = '';
+        
+        // 1. Dibujar estructura vacía primero
         for (let i = 1; i <= config[currentCat]; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-shadow">
                     <div class="relative h-48 bg-gray-200 group">
-                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Sube+Foto" class="w-full h-full object-cover">
+                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Subir+Foto" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 gap-2">
                             <input type="text" placeholder="URL imagen..." onchange="updateMedia('img-${id}', this.value)" class="url-input">
                             <div class="flex gap-2">
@@ -227,8 +192,8 @@
                         </div>
                     </div>
                     <div class="p-6 flex-1 flex flex-col">
-                        <h3 id="title-${id}" data-db contenteditable="true" class="text-xl font-black text-secondary tracking-tighter uppercase font-serif">Nombre del Plato</h3>
-                        <p id="desc-${id}" data-db contenteditable="true" class="text-gray-400 mt-1 text-sm italic leading-tight">Breve descripción...</p>
+                        <h3 id="title-${id}" data-db contenteditable="true" class="text-xl font-black text-secondary uppercase font-serif">Nombre del Plato</h3>
+                        <p id="desc-${id}" data-db contenteditable="true" class="text-gray-400 mt-1 text-sm italic leading-tight">Descripción...</p>
                         <div class="mt-4 p-3 bg-gray-50 rounded-2xl border border-gray-100">
                             <div class="flex flex-col gap-2 mb-2">
                                 <div class="flex gap-2">
@@ -244,7 +209,22 @@
                     </div>
                 </div>`;
         }
-        loadData();
+
+        // 2. Cargar datos específicos para esta categoría
+        const { data } = await _supabase.from('menu_platos').select('*');
+        if (data) {
+            data.forEach(item => {
+                const el = document.getElementById(item.id_plato);
+                if (el && item.contenido) {
+                    if (el.tagName === 'IMG' || el.tagName === 'AUDIO') {
+                        el.src = item.contenido;
+                        if (el.tagName === 'AUDIO') el.classList.remove('hidden');
+                    } else {
+                        el.innerText = item.contenido;
+                    }
+                }
+            });
+        }
     }
 
     function showCategory(cat) {
@@ -253,13 +233,12 @@
             b.classList.remove('tab-active');
             b.classList.add('text-gray-400');
         });
-        const activeBtn = document.getElementById(`btn-${cat}`);
-        activeBtn.classList.add('tab-active');
-        activeBtn.classList.remove('text-gray-400');
+        document.getElementById(`btn-${cat}`).classList.add('tab-active');
+        document.getElementById(`btn-${cat}`).classList.remove('text-gray-400');
         render();
     }
 
-    // Inicialización
+    // Inicio automático
     render();
 </script>
 </body>
