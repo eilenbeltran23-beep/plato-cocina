@@ -20,61 +20,51 @@
     <style>
         [contenteditable="true"]:focus { outline: 3px solid #E9723A; background: #fff; padding: 2px; border-radius: 4px; }
         .tab-active { border-bottom: 4px solid #E9723A; color: #E9723A; font-weight: 800; }
+        .camera-overlay { background: rgba(0,0,0,0.9); display: none; }
+        audio::-webkit-media-controls-panel { background-color: #f3f4f6; }
     </style>
 </head>
 <body class="bg-neutralBg min-h-screen pb-32 font-sans">
 
+<div id="camera-modal" class="fixed inset-0 z-[100] camera-overlay flex flex-col items-center justify-center p-4">
+    <div class="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl">
+        <video id="video" class="w-full rounded-2xl bg-black mb-4" autoplay></video>
+        <div class="flex gap-3">
+            <button onclick="takePhoto()" class="flex-1 bg-primary text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition">📸 CAPTURAR</button>
+            <button onclick="closeCamera()" class="flex-1 bg-gray-200 text-secondary font-bold py-4 rounded-2xl active:scale-95 transition">CERRAR</button>
+        </div>
+        <canvas id="canvas" class="hidden"></canvas>
+    </div>
+</div>
+
 <header class="py-10 text-center px-4 max-w-6xl mx-auto border-b border-gray-200">
-    <div class="inline-flex items-center gap-2 border border-gray-200 bg-white rounded-full px-4 py-1.5 shadow-sm mb-6 text-sm font-semibold tracking-wide text-pTag">
+    <div class="inline-flex items-center gap-2 border border-gray-200 bg-white rounded-full px-4 py-1.5 shadow-sm mb-6 text-sm font-semibold text-pTag">
         <span class="w-2.5 h-2.5 rounded-full bg-pTag"></span> MAGDALENA · COLOMBIA
     </div>
-    <h1 class="text-4xl md:text-5xl font-black text-secondary leading-tight max-w-4xl mx-auto mb-4 font-sans">
-        Institución Educativa Técnica Departamental <span class="block text-[#C2410C] font-sans tracking-tight">“María Alfaro de Ospino”</span>
+    <h1 class="text-4xl md:text-5xl font-black text-secondary leading-tight mb-4 uppercase">
+        IED <span class="text-[#C2410C]">“María Alfaro de Ospino”</span>
     </h1>
     
     <div class="bg-white/50 border border-gray-100 rounded-2xl p-6 max-w-2xl mx-auto mt-6 shadow-sm">
         <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-12">
             <div>
-                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada del Proyecto</p>
-                <p id="encargada-nombre" data-db contenteditable="true" class="text-lg font-bold text-secondary italic">Escribe el Nombre</p>
+                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Encargada</p>
+                <p id="encargada-nombre" data-db contenteditable="true" class="text-lg font-bold text-secondary italic">Nombre</p>
             </div>
-            <div class="border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-12">
-                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Grado Escolar</p>
-                <p id="grado-escolar" data-db contenteditable="true" class="text-lg font-bold text-secondary">Escribe el Grado</p>
+            <div>
+                <p class="text-[10px] font-bold text-pTag uppercase tracking-widest mb-1">Grado</p>
+                <p id="grado-escolar" data-db contenteditable="true" class="text-lg font-bold text-secondary">Grado</p>
             </div>
         </div>
     </div>
 </header>
 
-<section class="bg-primary pt-16 pb-16 px-6 relative overflow-hidden">
-    <div class="max-w-6xl mx-auto text-center md:text-left md:grid md:grid-cols-2 gap-12 items-center">
-        <div>
-            <div class="inline-block bg-white/20 border border-white/30 text-white rounded-full px-5 py-2.5 font-bold uppercase tracking-widest text-xs mb-8">
-                PROYECTO CULTURAL
-            </div>
-            <h2 class="text-6xl md:text-8xl font-black text-white leading-tight font-serif mb-6 tracking-tighter">
-                Plato cocina <span class="block text-secondary">y se divierte</span>
-            </h2>
-            <p class="text-white text-lg opacity-80 leading-relaxed max-w-xl">
-                Nuestro proyecto cultural une la tradición culinaria del Magdalena con la alegría de la creatividad.
-            </p>
-        </div>
-        
-        <div class="relative mt-12 md:mt-0 flex justify-center md:justify-end group">
-            <div class="relative w-[380px] h-[380px]">
-                <img id="img-hero-principal" data-db 
-                     src="https://github.com/eilenbeltran23-beep/plato-cocina/blob/main/hero-plato.jpg?raw=true" 
-                     class="w-full h-full object-cover rounded-3xl border-8 border-white shadow-2xl">
-                
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6 rounded-3xl">
-                    <div class="w-full">
-                        <p class="text-white text-xs font-bold mb-2 text-center uppercase">Cambiar Imagen Principal:</p>
-                        <input type="text" placeholder="Pega URL nueva + Enter" 
-                               onchange="updateImage('img-hero-principal', this.value)" 
-                               class="w-full p-2 rounded text-xs shadow-lg">
-                    </div>
-                </div>
-            </div>
+<section class="bg-primary py-16 px-6 text-center text-white">
+    <h2 class="text-6xl md:text-8xl font-black font-serif tracking-tighter mb-8">Plato cocina <span class="text-secondary">y se divierte</span></h2>
+    <div class="relative w-64 h-64 mx-auto group">
+        <img id="img-hero-principal" data-db src="https://github.com/eilenbeltran23-beep/plato-cocina/blob/main/hero-plato.jpg?raw=true" class="w-full h-full object-cover rounded-full border-8 border-white shadow-2xl">
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full p-4">
+            <input type="text" placeholder="URL Imagen + Enter" onchange="updateImage('img-hero-principal', this.value)" class="w-full p-2 rounded text-black text-xs">
         </div>
     </div>
 </section>
@@ -82,17 +72,15 @@
 <nav class="bg-white sticky top-0 z-50 shadow-md border-b-2 border-primary mt-[-30px] rounded-t-3xl max-w-6xl mx-auto">
     <div class="flex justify-center gap-10 p-5">
         <button onclick="showCategory('salados')" id="btn-salados" class="tab-btn tab-active text-xl">🥘 Salados</button>
-        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-400 text-xl hover:text-primary transition">🍰 Postres</button>
-        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-400 text-xl hover:text-primary transition">🍹 Bebidas</button>
+        <button onclick="showCategory('postres')" id="btn-postres" class="tab-btn text-gray-400 text-xl">🍰 Postres</button>
+        <button onclick="showCategory('bebidas')" id="btn-bebidas" class="tab-btn text-gray-400 text-xl">🍹 Bebidas</button>
     </div>
 </nav>
 
 <main id="container" class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-6xl"></main>
 
-<div class="fixed top-6 right-6 z-50">
-    <button onclick="saveAll()" class="bg-secondary hover:bg-black text-white font-bold text-sm px-8 py-3 rounded-full shadow-2xl transition-all active:scale-95 flex items-center gap-2 group">
-        <span>💾</span> <span class="group-hover:tracking-wider">GUARDAR TODO</span>
-    </button>
+<div class="fixed bottom-6 right-6 z-50">
+    <button onclick="saveAll()" class="bg-secondary text-white font-bold px-10 py-4 rounded-full shadow-2xl hover:bg-black transition transform active:scale-95">💾 GUARDAR TODO</button>
 </div>
 
 <script>
@@ -101,7 +89,75 @@
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
     let currentCat = 'salados';
+    let mediaRecorder;
+    let audioChunks = [];
     const config = { salados: 40, postres: 30, bebidas: 30 };
+
+    async function openCamera(id) {
+        window.targetId = id;
+        document.getElementById('camera-modal').style.display = 'flex';
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('video').srcObject = stream;
+    }
+    function closeCamera() {
+        const stream = document.getElementById('video').srcObject;
+        if(stream) stream.getTracks().forEach(t => t.stop());
+        document.getElementById('camera-modal').style.display = 'none';
+    }
+    function takePhoto() {
+        const canvas = document.getElementById('canvas');
+        const video = document.getElementById('video');
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        document.getElementById(window.targetId).src = canvas.toDataURL('image/jpeg');
+        closeCamera();
+    }
+
+    async function startRecording(btn, audioId) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const audioPlayer = document.getElementById(audioId);
+                    audioPlayer.src = reader.result;
+                    audioPlayer.classList.remove('hidden');
+                    btn.innerText = "🎤 RE-GRABAR";
+                    btn.classList.replace('bg-red-500', 'bg-green-500');
+                };
+            };
+
+            mediaRecorder.start();
+            btn.innerText = "🛑 DETENER";
+            btn.classList.replace('bg-gray-100', 'bg-red-500');
+            btn.classList.add('text-white');
+            btn.onclick = () => stopRecording(btn, audioId);
+        } catch (err) {
+            alert("Error al acceder al micrófono.");
+        }
+    }
+
+    function stopRecording(btn, audioId) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        btn.onclick = () => startRecording(btn, audioId);
+    }
+
+    async function saveAll() {
+        const elements = document.querySelectorAll('[data-db]');
+        const updates = Array.from(elements).map(el => ({
+            id_plato: el.id,
+            contenido: el.tagName === 'IMG' || el.tagName === 'AUDIO' ? el.src : el.innerText
+        }));
+        const { error } = await _supabase.from('menu_platos').upsert(updates);
+        if(!error) alert("¡Proyecto guardado con éxito!");
+    }
 
     async function loadData() {
         const { data } = await _supabase.from('menu_platos').select('*');
@@ -109,54 +165,37 @@
             data.forEach(item => {
                 const el = document.getElementById(item.id_plato);
                 if (el) {
-                    if (el.tagName === 'IMG') {
-                        el.src = item.contenido || (el.id === 'img-hero-principal' ? 'https://github.com/eilenbeltran23-beep/plato-cocina/blob/main/hero-plato.jpg?raw=true' : 'https://via.placeholder.com/400?text=Sube+Foto');
-                    } else {
-                        el.innerText = item.contenido;
-                    }
+                    el.src = item.contenido;
+                    if (el.tagName === 'AUDIO' && item.contenido) el.classList.remove('hidden');
+                    if (el.tagName !== 'IMG' && el.tagName !== 'AUDIO') el.innerText = item.contenido;
                 }
             });
         }
     }
 
-    async function saveAll() {
-        const elements = document.querySelectorAll('[data-db]');
-        const updates = Array.from(elements).map(el => ({
-            id_plato: el.id,
-            contenido: el.tagName === 'IMG' ? el.src : el.innerText
-        }));
-        const { error } = await _supabase.from('menu_platos').upsert(updates);
-        if (!error) alert("¡Cambios guardados globalmente!");
-    }
-
-    function updateImage(id, url) {
-        if(url.trim() !== "") document.getElementById(id).src = url;
-    }
+    function updateImage(id, url) { if(url) document.getElementById(id).src = url; }
 
     function render() {
         const cont = document.getElementById('container');
         cont.innerHTML = '';
-        const limit = config[currentCat];
-        for (let i = 1; i <= limit; i++) {
+        for (let i = 1; i <= config[currentCat]; i++) {
             const id = `${currentCat}-${i}`;
             cont.innerHTML += `
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all flex flex-col">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                     <div class="relative h-48 bg-gray-200 group">
-                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Sube+Foto" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                            <input type="text" placeholder="URL de la foto + Enter" onchange="updateImage('img-${id}', this.value)" class="w-full p-2 rounded text-xs">
-                        </div>
+                        <img id="img-${id}" data-db src="https://via.placeholder.com/400?text=Foto" class="w-full h-full object-cover">
+                        <button onclick="openCamera('img-${id}')" class="absolute top-2 right-2 bg-white/90 p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition">📷</button>
                     </div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-[10px] font-bold text-primary uppercase italic">N#${i} - ${currentCat}</span>
-                            <h3 id="title-${id}" data-db contenteditable="true" class="text-xl font-black text-secondary mt-1 font-serif tracking-tighter">Nombre del Plato</h3>
-                            <p id="desc-${id}" data-db contenteditable="true" class="text-gray-500 mt-2 text-sm italic border-t pt-4 border-gray-50">Editar descripción...</p>
+                    <div class="p-6 flex-1">
+                        <h3 id="title-${id}" data-db contenteditable="true" class="text-xl font-black text-secondary tracking-tighter">NOMBRE DEL PLATO</h3>
+                        <p id="desc-${id}" data-db contenteditable="true" class="text-gray-400 mt-1 text-sm italic">Descripción...</p>
+                        
+                        <div class="mt-4 p-3 bg-gray-50 rounded-2xl">
+                            <button onclick="startRecording(this, 'audio-${id}')" class="w-full bg-gray-100 py-2 rounded-xl text-[11px] font-bold mb-2 tracking-widest">🎤 GRABAR</button>
+                            <audio id="audio-${id}" data-db controls class="w-full h-8 hidden"></audio>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-dashed border-gray-200">
-                            <p class="text-[9px] font-bold text-pTag uppercase tracking-widest mb-1">Estudiante:</p>
-                            <p id="autor-${id}" data-db contenteditable="true" class="text-sm font-bold text-secondary uppercase">Escribe tu nombre</p>
-                        </div>
+
+                        <p id="autor-${id}" data-db contenteditable="true" class="text-[10px] font-bold text-primary mt-4 text-right uppercase">ESTUDIANTE</p>
                     </div>
                 </div>`;
         }
@@ -165,8 +204,8 @@
 
     function showCategory(cat) {
         currentCat = cat;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-gray-500'));
-        document.getElementById(`btn-${cat}`).classList.add('tab-active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-400'));
+        document.getElementById(`btn-${cat}`).classList.remove('text-gray-400');
         render();
     }
 
